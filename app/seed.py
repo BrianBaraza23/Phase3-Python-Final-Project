@@ -1,40 +1,85 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from faker import Faker
-from sqlalchemy.orm import sessionmaker
-from models import Movie, Actor, Category, Base
-from database import engine, init_db
+import random
+from database import session
+from models import Movie, Actor
 
-def generate_dummy_data(session):
+
+if __name__ == "__main__":
+
+    session.query(Movie).delete()
+    session.query(Actor).delete()
+
     fake = Faker()
 
-    # Create categories
-    categories = [Category(name=fake.word()) for _ in range(5)]
-    session.add_all(categories)
-    session.commit()
+    all_actors = []
 
-    # Create actors
-    actors = [Actor(name=fake.name()) for _ in range(20)]
-    session.add_all(actors)
-    session.commit()
-
-    # Create movies
-    for _ in range(20):
-        title = fake.catch_phrase()
-        category = fake.random_element(categories)
-        actor = fake.random_element(actors)
-        rating = fake.random_int(1, 10)
+    for i in range(40):
         
-        movie = Movie(title=title, category=category, actor=actor, rating=rating)
-        session.add(movie)
+        actor = Actor(
+            name=fake.name(),
+        )
+
+        session.add(actor)
+        all_actors.append(actor)
 
     session.commit()
 
-if __name__ == '__main__':
-    init_db()  # Initialize the database
-    Session = sessionmaker(bind=engine)
-    session = Session()
 
-    generate_dummy_data(session)
+    movie_categories = [
+        "Action",
+        "Adventure",
+        "Animation",
+        "Comedy",
+        "Crime",
+        "Documentary",
+        "Drama",
+        "Family",
+        "Fantasy",
+        "Horror",
+        "Mystery",
+        "Romance",
+        "Science Fiction",
+        "Thriller",
+        "War",
+        "Western",
+        "Musical",
+        "Historical",
+        "Biography",
+        "Fantasy",
+        "Superhero",
+    ]
+
+    suffixes = [
+        "Adventure",
+        "Journey",
+        "Quest",
+        "Mystery",
+        "Secret",
+        "Conspiracy",
+        "Dream",
+        "Nightmare",
+        "Legend",
+        "Story",
+        "Tale",
+        "Chronicles",
+        "Legacy",
+    ]
+    
+    all_movies = []
+
+    for actor in all_actors:
+        for i in range(random.randint(1, 5)):
+
+            movie = Movie(
+                title= f"{fake.word().title()} {random.choice(suffixes)}",
+                rating=random.randint(1, 10),
+                category=random.choice(movie_categories),
+                actor_id=actor.id,
+            )
+
+            session.add(movie)
+            all_movies.append(movie)
+
+    session.commit()
     session.close()
+    print("Database seeded successfully!")
