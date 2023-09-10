@@ -64,10 +64,15 @@ Follow these steps to set up the project:
   Run: "python3 cli.py" then the expected commands 
 
   Commands:
+  
   add-movie         Add a new movie to the database.
+
   delete-movie      Delete a movie from the database.
+
   find-by-actor     Find movies by actor
+
   find-by-category  Find movies by category
+
   find-by-title     Find movie by title
 
 ## License
